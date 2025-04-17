@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>417_TASK</title>
+    <style>
+      h2 {
+        width: 100%;
+        height: 100px;
+        background-color: #f0f0f0;
+        border: 1px solid #aaa;
+        line-height: 100px;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      input {
+        width: 80%;
+
+        line-height: 100px;
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 20px;
+      }
+      button {
+        width: 15%;
+        line-height: 100px;
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 20px;
+      }
+      .del {
+        width: 15%;
+        line-height: 50;
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 20px;
+      }
+      #ido {
+        font-size: 20px;
+      }
+
+      #idolist {
+        text-align: center;
+        font-size: 40px;
+      }
+
+      li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        padding: 8px;
+        font-size: 30px;
+      }
+
+      .tl {
+        flex: 1;
+      }
+
+      .list-btn {
+        display: flex;
+        gap: 5px;
+      }
+
+      .sujung,
+      .del {
+        width: 150px;
+        height: 100px;
+        padding: 5px 10px;
+        font-size: 15px;
+        line-height: 50px;
+
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>내가 할 일</h2>
+    <input type="text" id="dolist" placeholder="할 일 입력" />
+    <button onclick="savedo()">추가</button>
+    <!--할 일 추가 버튼-->
+    <h2>할 일 목록</h2>
+    <ul id="idolist"></ul>
+    <!--추가된 할일 표시 목록-->
+
+    <script>
+      function savedo() {
+        const ido = document.getElementById("dolist").value; //입력값 가져옴
+        if (!ido) return; //공백 입력 방지
+        let list = JSON.parse(localStorage.getItem("dolist")) || []; //로컬 저장소에서 데이터 가져옴
+        list.push(ido); // 입력한 할 일을 배열에 추가
+        localStorage.setItem("dolist", JSON.stringify(list)); //업데이트 된 목록 로컬저장소에 저장
+
+        displayList(); // 목록 업데이트
+        document.getElementById("dolist").value = ""; //입력창 초기화
+
+        //추가 제대로 되는지 테스트용 콘솔 출력
+        console.log(JSON.parse(localStorage.getItem("dolist")));
+      }
+
+      function displayList() {
+        let list = JSON.parse(localStorage.getItem("dolist")) || []; // 로컬저장소에서 목록 데이터 가져옴
+        const idolist = document.getElementById("idolist");
+        idolist.innerHTML = ""; //기존 목록 초기화
+
+        list.forEach((item, index) => {
+          const li = document.createElement("li"); //새로운 목록 항목 생성
+
+          const tasklist = document.createElement("span");
+          tasklist.className = "tl";
+          tasklist.innerText = item; // 할일 텍스트 추가
+          li.appendChild(tasklist); // 목록 항목에 추가
+
+          const listbtn = document.createElement("div");
+          listbtn.className = "list-btn";
+
+          const delbtn = document.createElement("button"); //목록 삭제 버튼 추가
+          delbtn.className = "del";
+          delbtn.innerText = "삭제";
+          delbtn.onclick = () => {
+            list.splice(index, 1); // 해당 목록 제거
+            localStorage.setItem("dolist", JSON.stringify(list)); //변경된 목록 저장
+            displayList(); // 화면 업데이트
+          };
+
+          const sujungbtn = document.createElement("button"); //목록 수정 버튼 생성
+          sujungbtn.className = "sujung";
+          sujungbtn.innerText = "수정";
+          sujungbtn.onclick = () => {
+            const newText = prompt("수정할 내용 입력: ", item); // 사용자에게 수정할 내용을 받음
+            if (newText) {
+              list[index] = newText; //수정내용으로 변경
+              localStorage.setItem("dolist", JSON.stringify(list)); //변경된 목록 저장
+              displayList(); //화면 업데이트
+            }
+          };
+
+          listbtn.appendChild(sujungbtn); //수정버튼 추가
+          listbtn.appendChild(delbtn); //삭제버튼 추가
+          li.appendChild(listbtn); //수정,삭제버튼 그룹화
+          idolist.appendChild(li); //목록에 항목 추가
+        });
+      }
+
+      //페이지 로드 시 자동으로 저장된 목록 표시
+      window.onload = function () {
+        displayList();
+      };
+    </script>
+  </body>
+</html>
